@@ -1,12 +1,17 @@
-import React, {useState} from "react";
+import React, { useState, useContext } from "react";
 import MapDisplay from "./MapDisplay";
 import Data from "./Data";
+import { SearchContext } from "./SearchContext";
 
-import { makeStyles } from "@material-ui/core/styles";
-import { ThemeProvider } from '@material-ui/styles';
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+
+import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core/styles";
 
 import Drawer from "@material-ui/core/Drawer";
+import TextField from "@material-ui/core/TextField";
+import Slider from "@material-ui/core/Slider";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -20,6 +25,17 @@ import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
 
 const drawerWidth = 240;
+
+
+const ColorButton = withStyles((theme) => ({
+  root: {
+    color: ("#ffffff"),
+    backgroundColor: "#424242",
+    "&:hover": {
+      backgroundColor: "#0ff",
+    },
+  },
+}))(Button);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +70,35 @@ const darkTheme = createMuiTheme({
 export default function PermanentDrawerLeft() {
   const classes = useStyles();
   let count;
+  const { search, setSearch } = useContext(SearchContext);
+
   const [quakeCount, setQuakeCount] = useState(0);
+  const [fromDate, setFromDate] = useState("2020-08-01");
+  const [toDate, setToDate] = useState("2020-08-02");
+  const [minMag, setMinmag] = useState("5");
+
+
+  let handleFromDate = e => {
+    console.log(e.target.value);
+    setFromDate(e.target.value);
+    // setSearch({...search, from: e.target.value})
+  };
+  let handleToDate = e => {
+    console.log(e.target.value);    
+    setToDate(e.target.value);
+    // setSearch({ ...search, to: e.target.value });
+  };
+  let handleMinMag = (e, newVal) => {
+    // console.log(newVal);
+    setMinmag(newVal);
+    // setSearch({ ...search, mag: newVal });
+  }
+  let sendValues = () => {
+    setSearch({ from: fromDate, to: toDate, mag: minMag });
+  }
+
+
+
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -78,7 +122,55 @@ export default function PermanentDrawerLeft() {
           <div className={classes.toolbar} />
           <Divider />
           <p>Total: {quakeCount} earthquakes</p>
-          <Data />
+          <p>
+            val: {search.from} and {search.to}. Mag: {search.mag}
+          </p>
+          <form className={classes.container} noValidate>
+            <TextField
+              id="fromDate"
+              label="From:"
+              type="date"
+              defaultValue="2020-05-24"
+              value={fromDate}
+              onChange={handleFromDate}
+              className={classes.textField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <TextField
+              id="toDate"
+              label="To: "
+              type="date"
+              defaultValue="2020-05-24"
+              value={toDate}
+              onChange={handleToDate}
+              className={classes.textField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <Slider
+              defaultValue={3}
+              aria-labelledby="discrete-slider-small-steps"
+              step={0.5}
+              marks
+              min={0}
+              max={10}
+              valueLabelDisplay="auto"
+              value={minMag}
+              onChange={handleMinMag}
+            />
+          </form>
+          {/* <Data /> */}
+          <ColorButton
+            variant="contained"
+            color="primary"
+            className={classes.margin}
+            onClick={sendValues}
+          >
+            Search
+          </ColorButton>
           <Divider />
           <List>
             {["Europe", "Asia", "Americas", "Africa"].map((text, index) => (
@@ -103,7 +195,11 @@ export default function PermanentDrawerLeft() {
           </List>
         </Drawer>
         <main className={classes.content}>
-          <MapDisplay quakeCountMeth={() => {setQuakeCount(count)}} />
+          <MapDisplay
+            quakeCountMeth={() => {
+              setQuakeCount(count);
+            }}
+          />
         </main>
       </div>
     </ThemeProvider>

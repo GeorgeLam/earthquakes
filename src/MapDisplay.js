@@ -1,23 +1,25 @@
-import React, {Component, useState, useEffect} from 'react';
+import React, {Component, useState, useEffect, useContext} from 'react';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Popup, Circle, CircleMarker } from "react-leaflet";
+import {SearchContext} from './SearchContext';
 
 
 let MapShow = (props) => {
   const[response, setResponse] = useState();
   const[loaded, setLoaded] = useState();
+  const{search, setSearch} = useContext(SearchContext);
+  // const[value, setValue] = useState();
 
   useEffect(() => {(
     async() => {
       let data = await fetch(
-        "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2020-09-01&endtime=2020-09-02https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2019-09-01&endtime=2020-09-01&minmagnitude=7"
+        `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${search.from}&endtime=${search.to}&minmagnitude=${search.mag}`
       );
-      // console.log(await data.json())
       let body = await data.json()
       setResponse(body.features);
       setLoaded(true);
     })()
-  }, [])
+  }, [search])
 
   useEffect(() => {
     console.log(response)
@@ -53,18 +55,16 @@ let MapShow = (props) => {
                 ]}
                 fillColor="blue"
                 radius={200}
-                key={eq.id}
+                key={"cc" + eq.id}
               />
               <CircleMarker
                 center={[
                   eq.geometry.coordinates[1],
                   eq.geometry.coordinates[0],
                 ]}
-                key={"c" + eq.id}
-                //  {[eq.geometry.coordinates[0]}, {{eq.geometry.coordinates[1]]}
-                //  {[eq.geometry.coordinates[0], eq.geometry.coordinates[1]]}
+                key={"mk" + eq.id}
                 color="red"
-                radius={(eq.properties.mag - 4) * 10}
+                radius={(eq.properties.mag - search.mag) * 20 + 5}
               >
                 <Popup>
                   {new Date(eq.properties.time).toString()}
