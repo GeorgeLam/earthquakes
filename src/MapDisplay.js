@@ -16,43 +16,41 @@ import {
 } from "react-leaflet";
 import { SearchContext } from "./SearchContext";
 
-let MapDisplay = ({ response, loaded, search, coord }) => {
+let MapDisplay = ({ response, loaded, search, eqNumber }) => {
   // const[value, setValue] = useState();
   const [initPos, setInitPos] = useState({
-    lat: 0,
-    lng: 0,
+    lat: 30,
+    lng: -50,
     zoom: 2,
   });
 
   const markerRef = useRef(null);
 
   const [position, setPosition] = useState([initPos.lat, initPos.lng]);
-  useEffect(() => {
-    console.log(coord);
-  }, [coord]);
+  useEffect(() => {}, [eqNumber]);
 
   const inputRef = useRef([]);
 
-  // inputRef.current[idx].focus();
-
   useEffect(() => {
-    console.log(markerRef.current);
-    if (loaded && coord != null) {
-      inputRef.current[coord].leafletElement.openPopup();
-      console.log(inputRef.current[coord]);
+    if (
+      loaded &&
+      eqNumber != null &&
+      inputRef.current[eqNumber].leafletElement
+    ) {
+      inputRef.current[eqNumber].leafletElement.openPopup();
+      // console.log(inputRef.current[eqNumber]);
     }
     // console.log(document);
-  }, [loaded, coord]);
+  }, [loaded, eqNumber]);
 
   return (
     <Map id="mapid" center={position} zoom={initPos.zoom}>
+      {/* <h1 className="impose">Hello</h1> */}
       <TileLayer
-        attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+        attribution='&copy; <a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a> - <a href=\"https://www.openstreetmap.org\" target=\"_blank\">&copy; OpenStreetMap</a>&nbsp;contributors'
+        url="https://tile.jawg.io/jawg-dark/{z}/{x}/{y}.png?access-token=wkT9l2CuSSkDtJbfNSTGt1CZ1RvUlyvEsQGPno7ZbYUEsanlOSnekOKji50GN34g"
       />
-      {/* <CircleMarker center={[51.51, -0.12]} color="red" radius={20}>
-          <Popup>Earthquake</Popup>
-        </CircleMarker> */}
+
       {loaded &&
         response?.map((eq, idx) => (
           <React.Fragment key={eq.id}>
@@ -65,10 +63,16 @@ let MapDisplay = ({ response, loaded, search, coord }) => {
               ref={(el) => (inputRef.current[idx] = el)}
               center={[eq.geometry.coordinates[1], eq.geometry.coordinates[0]]}
               color="red"
-              radius={(eq.properties.mag - search.mag) * 20 + 5}
+              radius={
+                (eq.properties.mag - search.mag) * 20 +
+                10 +
+                (eq.properties.mag ^ 2)
+              }
             >
               <Popup>
-                {new Date(eq.properties.time).toString()}
+                {new Date(eq.properties.time).toLocaleString("en-GB", {
+                  timeZone: "UTC",
+                }) + " UTC"}
                 <br />
                 <a
                   target="_blank"

@@ -35,7 +35,7 @@ export default function InputSlider({ handleMinMag, valReset, setValReset }) {
   };
 
   useEffect(() => {
-    console.log(value);
+    // console.log(value);
     handleMinMag(value);
   }, [value]);
 
