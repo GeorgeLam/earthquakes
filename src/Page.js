@@ -15,10 +15,12 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 
-var drawerWidth = 180;
-if (window.innerWidth > 500) {
-  drawerWidth = 300;
-}
+// var drawerWidth = 180;
+// if (window.innerWidth > 500) {
+//   drawerWidth = 300;
+// }
+let drawerWidth;
+window.innerWidth > 500 ? (drawerWidth = 250) : (drawerWidth = 185);
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -113,17 +115,12 @@ export default function PermanentDrawerLeft() {
           `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${search.from}&endtime=${search.to}&minmagnitude=${search.mag}`
         );
         let body = await data.json();
+        setQuakeCount(body.features.length);
         setResponse(body.features);
         setLoaded(true);
       })();
     }
   }, [search]);
-
-  useEffect(() => {
-    if (response) {
-      setQuakeCount(response.length);
-    }
-  }, [response]);
 
   //For the 'past 24 hours' reset button:
   const [valReset, setValReset] = useState();
@@ -170,9 +167,18 @@ export default function PermanentDrawerLeft() {
             anchor="left"
           >
             <p className="title">Earthquake Finder</p>
+            <p className="subtitle">
+              by{" "}
+              <a
+                href="https://georgelam.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                George Lam
+              </a>
+            </p>
 
             <Divider />
-            <p className="criteria">Search criteria:</p>
             <form className="inputs" noValidate>
               <TextField
                 id="fromDate"
@@ -210,21 +216,21 @@ export default function PermanentDrawerLeft() {
             </form>
             <Divider />
             <List>
-              <ListItem button key="day" onClick={pastDay}>
+              <ListItem button key="day" onClick={pastDay} dense>
                 <ListItemIcon>{<AccessTimeIcon />}</ListItemIcon>
                 <ListItemText primary="Reset to past 24 hours" />
               </ListItem>
             </List>
             <Divider />
-            <p>Total: {quakeCount} earthquakes</p>
+            <p className="totalEQ">Total: {quakeCount} earthquakes</p>
 
             <List>
               {loaded ? (
                 response.map((eq, idx) => (
                   <ListItem
                     button
+                    dense
                     onClick={() => {
-                      // console.log("list");
                       listClick(idx);
                     }}
                     key={eq.id}

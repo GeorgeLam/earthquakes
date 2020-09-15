@@ -18,14 +18,23 @@ code {
 
 .title {
   font-size: 1.3em;
-  /* margin: 1em; */
+  margin: 1em 0 0;
 }
 
 @media (min-width: 500px) {
   .title {
     font-size: 1.5em;
-    margin: 1em;
+    margin: 1em 0.2em 0 0.2em;
   }
+}
+
+.subtitle {
+  font-style: oblique;
+}
+
+.subtitle a {
+  /* text-decoration: none; */
+  color: white;
 }
 
 .inputs {
@@ -37,6 +46,10 @@ code {
   margin: 1em auto;
 }
 
+.totalEQ {
+  margin: 0.8em 0 0;
+}
+
 .MuiSlider-root {
   color: white !important;
 }
@@ -45,8 +58,9 @@ button {
   border-radius: 2px;
   border: 0;
   padding: 0.2em 1em;
-  cursor: pointer;
+  margin: 0.8em 0 0;
   width: 50%;
+  cursor: pointer;
   background-color: rgb(255, 255, 255);
   transition: background-color 0.1s ease-in;
 }
