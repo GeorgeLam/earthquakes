@@ -1,10 +1,8 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
-import VolumeUp from "@material-ui/icons/VolumeUp";
 
 const useStyles = makeStyles({
   input: {
@@ -23,6 +21,7 @@ export default function InputSlider({ handleMinMag, valReset, setValReset }) {
     setValue(newValue);
   };
 
+  //Clicking 'past 24 hours' button resets values to default of magnitude 4
   useEffect(() => {
     if (valReset) {
       setValue(4);
@@ -39,6 +38,7 @@ export default function InputSlider({ handleMinMag, valReset, setValReset }) {
     handleMinMag(value);
   }, [value]);
 
+  //Prevents entry of out-of-bounds values
   const handleBlur = () => {
     if (value < 0) {
       setValue(0);

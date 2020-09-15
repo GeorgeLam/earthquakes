@@ -1,55 +1,24 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MapDisplay from "./MapDisplay";
 import InputSlider from "./Slider";
-import Data from "./Data";
-import { SearchContext } from "./SearchContext";
 
-import { makeStyles, withStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-
+import { makeStyles } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core/styles";
-// import getMuiTheme from "@material-ui/styles/getMuiTheme";
-import { MuiThemeProvider } from "@material-ui/core/styles";
-
 import Drawer from "@material-ui/core/Drawer";
 import TextField from "@material-ui/core/TextField";
-import Slider from "@material-ui/core/Slider";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
-import Grid from "@material-ui/core/Grid";
-import Input from "@material-ui/core/Input";
-
-import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 
 var drawerWidth = 180;
 if (window.innerWidth > 500) {
   drawerWidth = 300;
 }
-
-// const setDrawer = (dw) => {
-//   drawerWidth = dw;
-//   console.log(drawerWidth);
-// };
-
-const ColorButton = withStyles((theme) => ({
-  root: {
-    color: "#ffffff",
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    "&:hover": {
-      backgroundColor: "rgba(0, 0, 0, 0.8)",
-    },
-  },
-}))(Button);
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -92,25 +61,12 @@ const darkTheme = createMuiTheme({
   },
 });
 
-const theme2 = createMuiTheme({
-  slider: {
-    selectionColor: "swags",
-    trackSize: 30,
-  },
-  root: {
-    width: 250,
-  },
-  input: {
-    width: 42,
-  },
-});
-
 export default function PermanentDrawerLeft() {
   const classes = useStyles();
   let count;
 
+  //Upon load, map autoloads quakes from the past day
   var todayDate = new Date().toISOString().slice(0, 10);
-
   const yesterday = new Date(new Date());
   yesterday.setDate(yesterday.getDate() - 1);
   let ytdDate = yesterday.toISOString().slice(0, 10);
@@ -127,23 +83,6 @@ export default function PermanentDrawerLeft() {
   const [minMag, setMinmag] = useState(search.mag);
   const [open, setOpen] = useState(true);
   const optionsShow = useRef(null);
-
-  const [value, setValue] = React.useState(4);
-
-  const handleSliderChange = (event, newValue) => {
-    setValue(newValue);
-  };
-  const handleBlur = () => {
-    if (value < 0) {
-      setValue(0);
-    } else if (value > 10) {
-      setValue(10);
-    }
-  };
-
-  const handleInputChange = (event) => {
-    setValue(event.target.value === "" ? "" : Number(event.target.value));
-  };
 
   let handleFromDate = (e) => {
     setFromDate(e.target.value);
@@ -162,11 +101,13 @@ export default function PermanentDrawerLeft() {
 
   const [response, setResponse] = useState();
   const [loaded, setLoaded] = useState(false);
-  // const { search, setSearch } = useContext(SearchContext);
+  const [eqNumber, seteqNumber] = useState();
+
   useEffect(() => {
     if (search) {
       setLoaded(false);
-      // console.log(search);
+      seteqNumber(null);
+      //eqNumber is passed to mapDisplay to determine which map popup opens. Upon new search, it's nullified to close any open popup.
       (async () => {
         let data = await fetch(
           `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${search.from}&endtime=${search.to}&minmagnitude=${search.mag}`
@@ -180,11 +121,11 @@ export default function PermanentDrawerLeft() {
 
   useEffect(() => {
     if (response) {
-      // console.log(response);
       setQuakeCount(response.length);
     }
   }, [response]);
 
+  //For the 'past 24 hours' reset button:
   const [valReset, setValReset] = useState();
   const pastDay = (e) => {
     e.preventDefault();
@@ -199,9 +140,7 @@ export default function PermanentDrawerLeft() {
     setValReset(true);
   };
 
-  const [eqNumber, seteqNumber] = useState();
   const listClick = (eqNumber) => {
-    // console.log("List clicked", eqNumber);
     seteqNumber(eqNumber);
   };
 
@@ -209,13 +148,12 @@ export default function PermanentDrawerLeft() {
     <div className="full">
       <p
         ref={optionsShow}
-        className="impose"
+        className="optionsToggle"
         onClick={() => {
-          optionsShow.current.classList.remove("active");
-          setOpen(true);
+          setOpen(!open);
         }}
       >
-        Options
+        Toggle Options
       </p>
 
       <ThemeProvider theme={darkTheme}>
@@ -232,16 +170,7 @@ export default function PermanentDrawerLeft() {
             anchor="left"
           >
             <p className="title">Earthquake Finder</p>
-            <p
-              className="minimise"
-              onClick={() => {
-                optionsShow.current.classList.add("active");
-                console.log(optionsShow.current.classList);
-                setOpen(false);
-              }}
-            >
-              Hide Options
-            </p>
+
             <Divider />
             <p className="criteria">Search criteria:</p>
             <form className="inputs" noValidate>
@@ -326,9 +255,6 @@ export default function PermanentDrawerLeft() {
               loaded={loaded}
               search={search}
               eqNumber={eqNumber}
-              // closePopup={() => {
-              //   inputRef.current[eqNumber].leafletElement.closePopup();
-              // }}
             />
           </main>
         </div>

@@ -1,21 +1,12 @@
-import React, {useState} from 'react';
-import logo from './logo.svg';
-import './App.css';
-import MapDisplay from './MapDisplay';
-import Page from './Page';
-import 'leaflet/dist/leaflet.css';
-import {SearchContext} from "./SearchContext";
-
-
-
+import React from "react";
+import Page from "./Page";
+import "./App.css";
+import "leaflet/dist/leaflet.css";
 
 function App() {
-  const [search, setSearch] = useState({from: '', to: '', minmag: ''});
   return (
     <div className="App">
-      <SearchContext.Provider value={{ search, setSearch }}>
-        <Page />
-      </SearchContext.Provider>
+      <Page />
     </div>
   );
 }

@@ -17,8 +17,15 @@ code {
 }
 
 .title {
-  font-size: 1.5em;
-  margin: 1em 0.2em 0 0.2em;
+  font-size: 1.3em;
+  /* margin: 1em; */
+}
+
+@media (min-width: 500px) {
+  .title {
+    font-size: 1.5em;
+    margin: 1em;
+  }
 }
 
 .inputs {
@@ -48,22 +55,23 @@ button:hover {
   background-color: rgb(193, 193, 193);
 }
 
-.impose {
+.optionsToggle {
   z-index: 100000;
   color: white;
   position: absolute;
   top: 0;
   right: 20px;
-  visibility: hidden;
   font-size: 1.2em;
   cursor: pointer;
-}
-.impose.active {
-  visibility: visible;
+  padding: 0.8em;
 }
 
-.impose,
+.optionsToggle,
 .minimise {
   cursor: pointer;
   text-decoration: underline;
+}
+
+.popup {
+  text-align: center;
 }

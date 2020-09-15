@@ -1,51 +1,28 @@
-import React, {
-  Component,
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-} from "react";
-import L from "leaflet";
-import {
-  Map,
-  TileLayer,
-  Marker,
-  Popup,
-  Circle,
-  CircleMarker,
-} from "react-leaflet";
-import { SearchContext } from "./SearchContext";
+import React, { useEffect, useRef } from "react";
+import { Map, TileLayer, Popup, Circle, CircleMarker } from "react-leaflet";
 
 let MapDisplay = ({ response, loaded, search, eqNumber }) => {
-  // const[value, setValue] = useState();
-  const [initPos, setInitPos] = useState({
+  const popupRef = useRef([]);
+  const initPos = {
     lat: 30,
     lng: -50,
     zoom: 2,
-  });
+  };
 
-  const markerRef = useRef(null);
-
-  const [position, setPosition] = useState([initPos.lat, initPos.lng]);
-  useEffect(() => {}, [eqNumber]);
-
-  const inputRef = useRef([]);
-
+  //Clicking sidepanel EQs will open a popup on map, using eqNumber variable
   useEffect(() => {
     if (
       loaded &&
       eqNumber != null &&
-      inputRef.current[eqNumber].leafletElement
+      popupRef.current[eqNumber].leafletElement
     ) {
-      inputRef.current[eqNumber].leafletElement.openPopup();
-      // console.log(inputRef.current[eqNumber]);
+      popupRef.current[eqNumber].leafletElement.openPopup();
+      // console.log(popupRef.current[eqNumber]);
     }
-    // console.log(document);
   }, [loaded, eqNumber]);
 
   return (
-    <Map id="mapid" center={position} zoom={initPos.zoom}>
-      {/* <h1 className="impose">Hello</h1> */}
+    <Map id="mapid" center={[initPos.lat, initPos.lng]} zoom={initPos.zoom}>
       <TileLayer
         attribution='&copy; <a href=\"https://www.jawg.io\" target=\"_blank\">&copy; Jawg</a> - <a href=\"https://www.openstreetmap.org\" target=\"_blank\">&copy; OpenStreetMap</a>&nbsp;contributors'
         url="https://tile.jawg.io/jawg-dark/{z}/{x}/{y}.png?access-token=wkT9l2CuSSkDtJbfNSTGt1CZ1RvUlyvEsQGPno7ZbYUEsanlOSnekOKji50GN34g"
@@ -60,7 +37,7 @@ let MapDisplay = ({ response, loaded, search, eqNumber }) => {
               radius={200}
             />
             <CircleMarker
-              ref={(el) => (inputRef.current[idx] = el)}
+              ref={(el) => (popupRef.current[idx] = el)}
               center={[eq.geometry.coordinates[1], eq.geometry.coordinates[0]]}
               color="red"
               radius={
@@ -70,19 +47,27 @@ let MapDisplay = ({ response, loaded, search, eqNumber }) => {
               }
             >
               <Popup>
-                {new Date(eq.properties.time).toLocaleString("en-GB", {
-                  timeZone: "UTC",
-                }) + " UTC"}
-                <br />
-                <a
-                  target="_blank"
-                  href={
-                    "https://earthquake.usgs.gov/earthquakes/eventpage/" + eq.id
-                  }
-                >
-                  Earthquake:
-                </a>{" "}
-                {eq.properties.mag}, {eq.properties.place}
+                <div className="popup">
+                  {`Magnitude ${eq.properties.mag}, ${eq.properties.place}`}
+                  <br />
+                  {`Recorded ${new Date(eq.properties.time).toLocaleString(
+                    "en-GB",
+                    {
+                      timeZone: "UTC",
+                    }
+                  )} UTC`}
+                  <br />
+                  <a
+                    style={{ textAlign: "center" }}
+                    target="_blank"
+                    href={
+                      "https://earthquake.usgs.gov/earthquakes/eventpage/" +
+                      eq.id
+                    }
+                  >
+                    Learn more (USGS)
+                  </a>
+                </div>
               </Popup>
             </CircleMarker>
           </React.Fragment>
