@@ -97,8 +97,17 @@ export default function PermanentDrawerLeft() {
   };
   let sendValues = (e) => {
     e.preventDefault();
-    setLoaded(false);
-    setSearch({ from: fromDate, to: toDate, mag: minMag });
+    let dayCounter =
+      (new Date(toDate).getTime() / 1000 -
+        new Date(fromDate).getTime() / 1000) /
+      86400;
+    if ((minMag < 3.5 && dayCounter > 10) || (minMag < 5 && dayCounter > 90)) {
+      alert("Search criteria are too broad!");
+      return;
+    } else {
+      setLoaded(false);
+      setSearch({ from: fromDate, to: toDate, mag: minMag });
+    }
   };
 
   const [response, setResponse] = useState();
@@ -107,6 +116,7 @@ export default function PermanentDrawerLeft() {
 
   useEffect(() => {
     if (search) {
+      console.log("New search");
       setLoaded(false);
       seteqNumber(null);
       //eqNumber is passed to mapDisplay to determine which map popup opens. Upon new search, it's nullified to close any open popup.
